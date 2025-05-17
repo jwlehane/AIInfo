@@ -1,0 +1,10 @@
+[
+  {
+    "title": "Automated Compliance Checker",
+    "desc": "Use GenAI to scan documents and flag compliance gaps based on company policy."
+  },
+  {
+    "title": "Customer Support Chatbot",
+    "desc": "A chatbot that can answer common client queries using internal knowledge base."
+  }
+]
