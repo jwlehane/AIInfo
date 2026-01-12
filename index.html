@@ -214,11 +214,17 @@
                     <li>On the other axis, you would write out things that are <strong>specific to your business</strong>. This can be business personas (e.g., marketing manager, customer service agent, operations lead), workflows (e.g., content creation, customer support, product design), or strategic goals (e.g., increase efficiency, drive innovation, enhance customer experience).</li>
                 </ul>
                 <p>Then, have the team write sticky notes (either virtually or in person) with different ideas of how the two axes can intersect and place them in the right spot. This should get you to think creatively about how your organization can leverage gen AI to truly help your business priorities.</p>
+                <div class="my-6 text-center">
+                    <img src="https://placehold.co/600x400?text=Creative+Matrix" alt="Creative Matrix Diagram" class="mx-auto rounded shadow-lg">
+                </div>
             </section>
 
             <section>
                 <h2 class="text-xl font-semibold text-gray-700 border-b pb-2 mb-4">Example: Faux Floral Business</h2>
                 <p>Let’s take a look at this creative matrix sample from a team working on a faux floral business. On one axis, they have the business priorities for their faux floral business. On the other axis, they have some Google Cloud gen AI capabilities.</p>
+                <div class="my-6 text-center">
+                    <img src="https://placehold.co/600x400?text=Brainstorming+Examples" alt="Brainstorming Examples" class="mx-auto rounded shadow-lg">
+                </div>
                 <p>We will read out just a few examples of what the team can add on sticky notes, and then you will be able to see a few more below this video.</p>
 
                 <div class="sticky-note-example">
@@ -281,11 +287,12 @@
             const container = document.getElementById('ideasContainer');
             container.innerHTML = '<span class="text-gray-500">Loading...</span>';
             try {
-                const resp = await fetch('ideas.json');
+                const resp = await fetch('/ideas');
                 const ideas = await resp.json();
                 renderIdeas(ideas);
-            } catch {
-                container.innerHTML = '<span class="text-gray-400">No ideas found or could not load ideas.json.</span>';
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = '<span class="text-gray-400">Could not load ideas.</span>';
             }
         }
         function renderIdeas(ideas) {
@@ -313,17 +320,23 @@
                 const title = document.getElementById('ideaTitle').value.trim();
                 const desc = document.getElementById('ideaDesc').value.trim();
                 if (!title || !desc) return;
-                // Load existing ideas
-                let ideas = [];
+
                 try {
-                    const resp = await fetch('ideas.json');
-                    ideas = await resp.json();
-                } catch {}
-                ideas.push({ title, desc });
-                renderIdeas(ideas);
-                e.target.reset();
-                // NOTE: This does NOT persist to the server in static hosting!
-                // Saving to ideas.json requires backend logic, which static hosting cannot do.
+                    const resp = await fetch('/ideas', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ title, desc })
+                    });
+                    if (!resp.ok) throw new Error('Failed to save idea');
+                    const updatedIdeas = await resp.json();
+                    renderIdeas(updatedIdeas);
+                    e.target.reset();
+                } catch (err) {
+                    console.error(err);
+                    alert('Failed to add idea. Please try again.');
+                }
             };
         });
     </script>
